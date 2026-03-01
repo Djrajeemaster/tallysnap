@@ -152,37 +152,6 @@ export default function Scanner() {
       Alert.alert('Error', 'Text recognition unavailable.');
     }
   };
-    try {
-      let TR: any;
-      try {
-        TR = await import('expo-text-recognition');
-      } catch (impErr) {
-        console.warn('dynamic import failed, using stub', impErr);
-        TR = require('../text-recognition-stub.js');
-      }
-      if (!TR || typeof TR.recognizeText !== 'function') {
-        Alert.alert('Unavailable', 'Text recognition module not available. Use a dev client or build.');
-        return;
-      }
-      const res = await TR.recognizeText(uri);
-      const text = res.lines.map(l => l.text).join('\n');
-      setRecognizedText(text);
-
-      // try to parse and save a receipt
-      const summary = parseReceiptText(text);
-      const newReceipt = await addReceipt({
-        ...summary,
-        rawText: text,
-        imageUri: uri,
-      });
-      // navigate to detail view for review/edit
-      router.push(`/receipts/${newReceipt.id}`);
-    } catch (e) {
-      console.warn('OCR error', e);
-      Alert.alert('Error', 'Text recognition unavailable.');
-    }
-  };
-
   if (hasPermission === null) {
     return <View />;
   }

@@ -14,6 +14,8 @@ export default function ReceiptsListScreen() {
   const [filter, setFilter] = React.useState<string | undefined>(undefined);
 
   React.useEffect(() => {
+    // during E2E tests we set window.__E2E__ = true to bypass auth redirects
+    if (typeof window !== 'undefined' && (window as any).__E2E__) return;
     if (!loading && !user) {
       router.replace('/login');
     }
@@ -56,7 +58,7 @@ export default function ReceiptsListScreen() {
           </TouchableOpacity>
         )}
       />
-    </View>
+    </ThemedView>
   );
 }
 
