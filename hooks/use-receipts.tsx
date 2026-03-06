@@ -1,17 +1,17 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { Receipt } from '@/models/receipt';
-import { nanoid } from 'nanoid/non-secure';
-import { useAuth } from './use-auth';
 import { db } from '@/firebaseConfig';
+import type { Receipt } from '@/models/receipt';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   collection,
+  deleteDoc,
   doc,
+  getDocs,
   setDoc,
   updateDoc,
-  deleteDoc,
-  getDocs,
 } from 'firebase/firestore';
+import { nanoid } from 'nanoid/non-secure';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useAuth } from './use-auth';
 
 const STORAGE_KEY = '@tallysnap/receipts';
 
@@ -42,19 +42,18 @@ export function ReceiptsProvider({ children }: { children: React.ReactNode }) {
 
   // when user signs in, sync remote receipts
   useEffect(() => {
-    if (user) {
-      (async () => {
-        try {
-          const snap = await getDocs(collection(db, 'users', user.uid, 'receipts'));
-          const remote: Receipt[] = snap.docs.map(d => d.data() as Receipt);
-          // merge remote with local, prefer remote
-          setReceipts(remote);
-          await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(remote));
-        } catch (e) {
-          console.warn('Failed to sync receipts from cloud', e);
-        }
-      })();
-    }
+    if (!user || !db) return;
+    (async () => {
+      try {
+        const snap = await getDocs(collection(db, 'users', user.uid, 'receipts'));
+        const remote: Receipt[] = snap.docs.map(d => d.data() as Receipt);
+        // merge remote with local, prefer remote
+        setReceipts(remote);
+        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(remote));
+      } catch (e) {
+        console.warn('Failed to sync receipts from cloud', e);
+      }
+    })();
   }, [user]);
 
   const persist = async (list: Receipt[]) => {
@@ -78,7 +77,7 @@ export function ReceiptsProvider({ children }: { children: React.ReactNode }) {
     };
     const updated = [newItem, ...receipts];
     await persist(updated);
-    if (user) {
+    if (user && db) {
       try {
         await setDoc(doc(db, 'users', user.uid, 'receipts', newItem.id), newItem);
       } catch (e) {
@@ -91,7 +90,7 @@ export function ReceiptsProvider({ children }: { children: React.ReactNode }) {
   const updateReceipt = async (id: string, changes: Partial<Receipt>) => {
     const updated = receipts.map(r => (r.id === id ? { ...r, ...changes } : r));
     await persist(updated);
-    if (user) {
+    if (user && db) {
       try {
         await updateDoc(doc(db, 'users', user.uid, 'receipts', id), changes);
       } catch (e) {
@@ -101,9 +100,13 @@ export function ReceiptsProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteReceipt = async (id: string) => {
+    console.log('Deleting receipt:', id);
+    console.log('Current receipts:', receipts.length);
     const updated = receipts.filter(r => r.id !== id);
+    console.log('After filter:', updated.length);
     await persist(updated);
-    if (user) {
+    console.log('Receipt deleted successfully');
+    if (user && db) {
       try {
         await deleteDoc(doc(db, 'users', user.uid, 'receipts', id));
       } catch (e) {

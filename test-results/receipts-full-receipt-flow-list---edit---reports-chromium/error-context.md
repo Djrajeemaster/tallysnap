@@ -1,0 +1,42 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e8]:
+  - generic [ref=e13]:
+    - generic [ref=e14]:
+      - generic [ref=e15]: My Receipts
+      - generic [ref=e16]: 2 receipts
+    - generic [ref=e17]:
+      - generic [ref=e19] [cursor=pointer]: 📷 Scan
+      - generic [ref=e21] [cursor=pointer]: 📊 Report
+    - combobox [ref=e23]:
+      - option "All Categories" [selected]
+      - option "Food & Dining"
+      - option "Travel"
+      - option "Fuel"
+      - option "Groceries"
+      - option "Entertainment"
+      - option "Utilities"
+      - option "Other"
+    - generic [ref=e25]:
+      - generic [ref=e27] [cursor=pointer]:
+        - generic [ref=e28]:
+          - generic [ref=e30]: FOOD
+          - generic [ref=e31]: ₹100.00
+        - generic [ref=e32]: My Cafe
+        - generic [ref=e34]: 2025-02-01
+        - generic [ref=e36]: 🗑️
+      - generic [ref=e38] [cursor=pointer]:
+        - generic [ref=e39]:
+          - generic [ref=e41]: GROCERIES
+          - generic [ref=e42]: ₹150.00
+        - generic [ref=e43]: Grocery Mart
+        - generic [ref=e45]: 2025-02-02
+        - generic [ref=e47]: 🗑️
+    - generic [ref=e49] [cursor=pointer]: Login
+  - tablist [ref=e51]:
+    - tab "Receipts" [selected] [ref=e53] [cursor=pointer]:
+      - generic [ref=e57]: Receipts
+    - tab "Scan" [ref=e59] [cursor=pointer]:
+      - generic [ref=e63]: Scan
+```
